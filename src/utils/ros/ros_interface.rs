@@ -170,11 +170,6 @@ impl RosInterface {
         history.clone()
     }
 
-
-
-
-
-
     pub fn get_current_position(&self) -> (usize, usize) {
         let pos = self.current_position.lock().unwrap();
         *pos

@@ -136,7 +136,6 @@ async fn run_explorer_mode(ros: RosInterface) -> Result<(), Box<dyn Error>> {
 
         // mover
         let _moved = ros.move_robot(&next_move).await?;
-
         // Verificar se mapa está completamente explorado
         if explorer.is_fully_mapped(current_pos) {
             trace!("Mapa explorado!");
@@ -145,8 +144,9 @@ async fn run_explorer_mode(ros: RosInterface) -> Result<(), Box<dyn Error>> {
         }
         
         if !explorer.is_area_mapped(current_pos) {
-            sleep(Duration::from_millis(100)).await;
+            sleep(Duration::from_millis(130)).await;
         }
+
     }    
     
     sleep(Duration::from_secs(1)).await;
