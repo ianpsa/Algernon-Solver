@@ -38,13 +38,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let ros = RosInterface::new(&ctx)?;
     ros.wait_for_services().await?;
     
-    let map_name = ros.reset_game(true).await?;
+    ros.reset_game(true).await?;
     sleep(Duration::from_secs(1)).await;
-    info!("{map_name}");
 
     match args.mode {
         Mode::Pathfinding => run_pathfinding_mode(ros).await,
-        Mode::Explorer => run_explorer_mode(ros, map_name).await,
+        Mode::Explorer => run_explorer_mode(ros).await,
     }
 }
 
@@ -102,7 +101,7 @@ async fn run_pathfinding_mode(ros: RosInterface) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn run_explorer_mode(ros: RosInterface, map_name: String) -> Result<(), Box<dyn Error>> {
+async fn run_explorer_mode(ros: RosInterface) -> Result<(), Box<dyn Error>> {
     let mut explorer = Explorer::new();
     
     // Esperar sensores inicializarem
@@ -136,7 +135,7 @@ async fn run_explorer_mode(ros: RosInterface, map_name: String) -> Result<(), Bo
         info!("Movimento: {} (posição atual: {:?})", next_move, current_pos);
 
         // mover
-        let moved = ros.move_robot(&next_move).await?;
+        let _moved = ros.move_robot(&next_move).await?;
 
         // Verificar se mapa está completamente explorado
         if explorer.is_fully_mapped(current_pos) {
@@ -149,10 +148,9 @@ async fn run_explorer_mode(ros: RosInterface, map_name: String) -> Result<(), Bo
         }
     }    
     
-    let map_name = ros.reset_game(false).await?;
     sleep(Duration::from_secs(1)).await;
         
-    let mut map = explored_map;
+    let mut map;
     
     loop {
         // Atualizar posição do Algernon no mapa

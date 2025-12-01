@@ -23,16 +23,13 @@ pub struct SensorData {
 
 #[derive(Debug, Clone)]
 pub struct SensorReading {
-    pub position: (usize, usize),
     pub sensors: SensorData,
 }
 
 pub struct RosInterface {
-    node: Arc<Mutex<Node>>,
     spin_flag: Arc<AtomicBool>,
     spin_thread: Option<thread::JoinHandle<()>>,
     sensor_history: Arc<Mutex<Vec<SensorReading>>>,
-    movement_queue: Arc<Mutex<Vec<String>>>,
     current_position: Arc<Mutex<(usize, usize)>>,
     sensor_task: Option<JoinHandle<()>>,
     move_client: Client<srv::MoveCmd::Service>,
@@ -62,7 +59,6 @@ impl RosInterface {
         )?;
 
         let sensor_history = Arc::new(Mutex::new(Vec::new()));
-        let movement_queue = Arc::new(Mutex::new(Vec::new()));
         let current_position = Arc::new(Mutex::new((0, 0)));
 
         let subscriber = node.subscribe::<msg::RobotSensors>(
@@ -71,7 +67,6 @@ impl RosInterface {
         )?;
 
         let sensor_history_clone = sensor_history.clone();
-        let current_position_clone = current_position.clone();
         let sensor_task = tokio::spawn(async move {
             let mut stream = subscriber;
             while let Some(msg) = stream.next().await {
@@ -86,12 +81,9 @@ impl RosInterface {
                     down_right: string_to_char(&msg.down_right),
                 };
 
-                let position = {
-                    let pos_guard = current_position_clone.lock().unwrap();
-                    *pos_guard
-                };
 
-                let reading = SensorReading { position, sensors };
+
+                let reading = SensorReading { sensors };
                 let mut history = sensor_history_clone.lock().unwrap();
                 history.push(reading);
             }
@@ -111,11 +103,9 @@ impl RosInterface {
         });
 
         Ok(Self {
-            node: node_arc,
             spin_flag,
             spin_thread: Some(spin_thread),
             sensor_history,
-            movement_queue,
             current_position,
             sensor_task: Some(sensor_task),
             move_client,
@@ -180,20 +170,10 @@ impl RosInterface {
         history.clone()
     }
 
-    pub fn clear_sensor_history(&self) {
-        let mut history = self.sensor_history.lock().unwrap();
-        history.clear();
-    }
 
-    pub fn queue_move(&self, direction: String) {
-        let mut queue = self.movement_queue.lock().unwrap();
-        queue.push(direction);
-    }
 
-    pub fn drain_movement_queue(&self) -> Vec<String> {
-        let mut queue = self.movement_queue.lock().unwrap();
-        queue.drain(..).collect()
-    }
+
+
 
     pub fn get_current_position(&self) -> (usize, usize) {
         let pos = self.current_position.lock().unwrap();

@@ -83,28 +83,6 @@ impl Explorer {
         true
     }
     
-    pub fn get_map(&self) -> Map {
-        // Clonar o mapa interno para uso externo
-        Map::from_grid(self.export_map_as_grid())
-    }
-    
-    fn export_map_as_grid(&self) -> Vec<Vec<char>> {
-        let mut grid = vec![vec!['?'; 29]; 29];
-        for row in 0..29 {
-            for col in 0..29 {
-                let cell = self.map.get_cell((row, col));
-                grid[row][col] = match cell {
-                    CellState::Unknown => '?',
-                    CellState::Wall => 'b',
-                    CellState::Target => 't',
-                    CellState::Free => 'f',
-                    CellState::Robot => 'r',
-                };
-            }
-        }
-        grid
-    }
-    
     pub fn next_move(&mut self, current_pos: (usize, usize), sensors: &SensorData) -> Option<String> {
         self.update_map_from_sensors(sensors, current_pos);
         

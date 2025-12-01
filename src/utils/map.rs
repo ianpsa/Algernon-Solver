@@ -16,12 +16,6 @@ pub struct Map {
 }
 
 impl Map {
-    fn is_it_inside(&self, row: i32, col: i32) -> bool {
-        row >= 0
-            && col >= 0
-            && (row as usize) < self.rows
-            && (col as usize) < self.cols
-    }
 
     pub fn get_neighbors(&self, pos: (usize, usize)) -> Vec<(usize, usize)> {
         let (x, y) = pos;
@@ -117,13 +111,4 @@ impl Map {
         self.target_pos
     }
 
-    pub fn new() -> Self {
-        Self {
-            grid: Vec::new(),
-            rows: 0,
-            cols: 0,
-            robot_pos: None,
-            target_pos: None,
-        }
-    }
 }
