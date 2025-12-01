@@ -50,3 +50,7 @@ Explora o mapa usando apenas sensores e monta o mapa usando wall following + BFS
 ```
 
 Pronto! veja algernon se contorcendo por entre os obstáculos do labirinto...
+
+## Videozão da massa
+
+[Link do vídeo](https://drive.google.com/file/d/1Pn3JndurPFw6__gpZmwyfoJ9d2JGue60/view?usp=sharing)
