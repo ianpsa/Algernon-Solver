@@ -3,7 +3,7 @@ mod utils;
 use std::error::Error;
 use clap::{Parser, ValueEnum};
 use tokio::time::{Duration, sleep};
-use log::{info, error, trace};
+use log::{error, info, trace};
 use utils::algorithms::pathfinding::bfs_pathfind;
 use utils::algorithms::explorer::Explorer;
 use utils::map::Map;
@@ -139,7 +139,8 @@ async fn run_explorer_mode(ros: RosInterface) -> Result<(), Box<dyn Error>> {
 
         // Verificar se mapa está completamente explorado
         if explorer.is_fully_mapped(current_pos) {
-            info!("Mapa explorado!");
+            trace!("Mapa explorado!");
+            ros.reset_game(false).await?;
             break;
         }
         
